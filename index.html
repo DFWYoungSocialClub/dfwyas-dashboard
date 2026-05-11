@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFW Young & Social Club — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:    #FEFCF7;
+  --cream-dk: #F5F0E8;
+  --gold:     #C9A84C;
+  --gold-lt:  #E8D5A3;
+  --gold-dk:  #9A7230;
+  --text-dk:  #1C1A14;
+  --text-mid: #4A4435;
+  --text-lt:  #8A7F68;
+  --sage:     #7A9E7E;
+  --rose:     #C97B6A;
+  --offsite:  #D4880A;
+
+  /* Fluid type scale — all based on viewport width */
+  --f-xs:   0.60vw;   /* ~11.5px @ 1920 */
+  --f-sm:   0.72vw;   /* ~14px @ 1920 */
+  --f-base: 0.83vw;   /* ~16px @ 1920 */
+  --f-md:   0.95vw;   /* ~18px @ 1920 */
+  --f-lg:   1.1vw;    /* ~21px @ 1920 */
+  --f-xl:   1.25vw;   /* ~24px @ 1920 */
+  --f-2xl:  1.45vw;   /* ~28px @ 1920 */
+  --f-3xl:  3.2vw;    /* ~62px clock @ 1920 */
+
+  /* Fluid spacing */
+  --sp-xs:  0.4vw;
+  --sp-sm:  0.6vw;
+  --sp-md:  0.8vw;
+  --sp-lg:  1.0vw;
+
+  /* Panel widths */
+  --left-w:   16.7vw;
+  --mid-w:    19.3vw;
+}
+
+html, body {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  background: var(--cream-dk);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-dk);
+  font-size: var(--f-base);
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 10% 15%, rgba(201,168,76,0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 90% 85%, rgba(122,158,126,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 35% 35% at 65% 8%,  rgba(201,130,106,0.06) 0%, transparent 55%);
+  animation: bgFloat 20s ease-in-out infinite alternate;
+  pointer-events: none; z-index: 0;
+}
+@keyframes bgFloat {
+  0%   { opacity:.7; transform:scale(1); }
+  100% { opacity:1;  transform:scale(1.03) translateY(-5px); }
+}
+
+/* ── GRID ── */
+.layout {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: var(--left-w) var(--mid-w) 1fr;
+  height: 100vh;
+}
+
+.panel {
+  display: flex; flex-direction: column;
+  padding: var(--sp-lg) var(--sp-md);
+  overflow: hidden;
+}
+.panel-left {
+  background: linear-gradient(175deg, rgba(255,252,247,0.97) 0%, rgba(247,243,234,0.94) 100%);
+  border-right: 1px solid rgba(201,168,76,0.13);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+.panel-mid {
+  background: transparent;
+  padding: var(--sp-lg) var(--sp-sm);
+  border-right: 1px solid rgba(201,168,76,0.10);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+.panel-right {
+  background: linear-gradient(185deg, rgba(255,252,247,0.96) 0%, rgba(247,243,234,0.92) 100%);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+
+.sec-hdr { display:flex; align-items:center; gap:var(--sp-xs); margin-bottom:var(--sp-sm); flex-shrink:0; }
+.sec-lbl { font-size:var(--f-xs); font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--gold-dk); white-space:nowrap; }
+.sec-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent); }
+
+/* LEFT PANEL */
+.brand { display:flex; align-items:center; gap:var(--sp-md); margin-bottom:var(--sp-md); flex-shrink:0; }
+.brand-icon { width:3.2vw; height:3.2vw; border-radius:0.8vw; flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.brand-icon img { width:3.2vw; height:3.2vw; object-fit:cover; }
+.brand-name { font-family:'Playfair Display',serif; font-size:var(--f-md); font-weight:600; line-height:1.25; color:var(--text-dk); }
+
+/* Clock */
+.clock-block { padding:var(--sp-sm) 0; border-bottom:1px solid rgba(201,168,76,0.12); margin-bottom:var(--sp-sm); flex-shrink:0; }
+.clock-time  { font-family:'Playfair Display',serif; font-size:var(--f-3xl); font-weight:400; letter-spacing:-0.1vw; line-height:1; color:var(--text-dk); }
+.clock-ampm  { font-size:var(--f-lg); font-weight:300; color:var(--text-lt); vertical-align:super; margin-left:0.15vw; }
+.clock-date  { font-family:'Playfair Display',serif; font-size:var(--f-lg); font-weight:400; color:var(--text-mid); margin-top:0.25vw; }
+.clock-greet { font-size:var(--f-sm); color:var(--text-lt); margin-top:0.15vw; line-height:1.4; font-style:italic; }
+
+/* Dance classes */
+.dance-scroll { flex:1; overflow-y:auto; scrollbar-width:none; }
+.dance-scroll::-webkit-scrollbar { display:none; }
+.day-grp  { margin-bottom:0.55vw; }
+.day-name { font-size:var(--f-xs); font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--gold-dk); padding:0.15vw 0 0.25vw; border-bottom:1px solid rgba(201,168,76,0.15); margin-bottom:0.25vw; }
+.cls-row  { display:grid; grid-template-columns:2.6vw 1fr; gap:0.3vw; padding:0.15vw 0.1vw; align-items:baseline; }
+.cls-time { font-size:var(--f-sm); color:var(--text-lt); white-space:nowrap; }
+.cls-name { font-size:var(--f-base); color:var(--text-mid); line-height:1.3; }
+.cls-name.b { font-weight:600; color:var(--text-dk); }
+
+/* Pricing */
+.price-bar  { flex-shrink:0; margin-top:var(--sp-sm); padding-top:var(--sp-sm); border-top:1px solid rgba(201,168,76,0.12); }
+.price-lbl  { font-size:var(--f-xs); letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dk); font-weight:600; margin-bottom:0.36vw; }
+.price-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.26vw; }
+.price-cell { background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.14); border-radius:0.4vw; padding:0.3vw 0.15vw; text-align:center; }
+.p-pack { font-size:var(--f-xs); color:var(--text-lt); letter-spacing:.09em; text-transform:uppercase; }
+.p-amt  { font-family:'Playfair Display',serif; font-size:var(--f-xl); color:var(--text-dk); font-weight:500; margin-top:0.05vw; }
+
+/* CENTER PANEL */
+.today-card {
+  border-radius:0.8vw; overflow:hidden; position:relative;
+  background:linear-gradient(160deg,#1C1A14 0%,#2C2618 100%);
+  margin-bottom:var(--sp-sm); flex-shrink:0;
+  border:1px solid rgba(201,168,76,0.22);
+  box-shadow:0 0.3vw 1.5vw rgba(28,26,20,0.2);
+  max-height:22vh; display:flex; flex-direction:column;
+}
+.tc-bg { position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg,rgba(201,168,76,0.12) 0%,rgba(122,158,126,0.06) 50%,rgba(106,143,168,0.08) 100%); animation:tcShimmer 8s ease-in-out infinite alternate; }
+@keyframes tcShimmer { 0%{opacity:.7} 100%{opacity:1} }
+.tc-deco { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,0.08); pointer-events:none; }
+
+.tc-header { position:relative; z-index:2; padding:0.7vw 0.8vw 0.4vw; flex-shrink:0; }
+.tc-eyebrow { font-size:var(--f-xs); letter-spacing:.22em; text-transform:uppercase; color:var(--gold-lt); font-weight:600; margin-bottom:0.15vw; display:flex; align-items:center; gap:0.3vw; }
+.tc-eyebrow::before { content:''; width:0.31vw; height:0.31vw; border-radius:50%; background:var(--gold); flex-shrink:0; animation:dotPulse 2s ease-in-out infinite; }
+@keyframes dotPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.tc-day-title { font-family:'Playfair Display',serif; font-size:var(--f-2xl); font-weight:500; color:#FEFCF7; line-height:1.1; }
+.tc-count { font-size:var(--f-sm); color:rgba(232,213,163,0.7); margin-top:0.1vw; }
+
+.tc-events { position:relative; z-index:2; flex:1; overflow:hidden; padding:0 0.6vw 0.4vw; }
+.tc-events-inner { animation: tcScroll linear infinite; }
+@keyframes tcScroll { 0%{transform:translateY(0)} 100%{transform:translateY(-50%)} }
+
+.tc-ev { display:flex; align-items:center; gap:0.4vw; padding:0.25vw 0.4vw; border-radius:0.5vw; margin-bottom:0.2vw; background:rgba(255,252,247,0.06); border:1px solid rgba(201,168,76,0.10); }
+.tc-ev.tc-happening { border-color:rgba(201,168,76,0.4); background:rgba(201,168,76,0.10); }
+.tc-ev-time  { font-size:var(--f-sm); font-weight:600; color:var(--gold-lt); white-space:nowrap; flex-shrink:0; min-width:2.8vw; }
+.tc-ev-info  { flex:1; min-width:0; }
+.tc-ev-title { font-size:var(--f-base); font-weight:500; color:#FEFCF7; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tc-ev-loc   { font-size:var(--f-xs); color:rgba(254,252,247,0.45); }
+.tc-ev-price { font-size:var(--f-sm); font-weight:600; color:var(--gold-lt); flex-shrink:0; }
+.tc-no-events { padding:0.6vw; text-align:center; font-size:var(--f-base); color:rgba(232,213,163,0.5); font-style:italic; }
+
+/* Stat strip */
+.stat-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:0.4vw; margin-bottom:0.6vw; flex-shrink:0; }
+.stat-cell  { background:rgba(255,252,247,0.7); border:1px solid rgba(201,168,76,0.11); border-radius:0.5vw; padding:0.5vw 0.6vw; position:relative; overflow:hidden; }
+.stat-cell::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--gold-lt),var(--gold)); opacity:.4; }
+.sc-lbl { font-size:var(--f-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); font-weight:600; }
+.sc-val { font-family:'Playfair Display',serif; font-size:var(--f-2xl); font-weight:500; color:var(--text-dk); line-height:1.1; }
+.sc-sub { font-size:var(--f-xs); color:var(--text-lt); margin-top:0.05vw; }
+
+/* Weekly recurring */
+.weekly-scroll { flex:1; overflow:hidden; min-height:0; }
+.w-section { margin-bottom:0.25vw; }
+.w-sec-title { font-size:var(--f-xs); font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-dk); margin-bottom:0.15vw; display:flex; align-items:center; gap:0.36vw; }
+.w-sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.22),transparent); }
+
+.w-row { display:grid; grid-template-columns:4.2vw 1fr; padding:0.15vw 0.4vw; border-radius:0.4vw; margin-bottom:0.05vw; align-items:start; transition:background .15s; gap:0.2vw; }
+.w-row:hover { background:rgba(201,168,76,0.05); }
+.w-row.today-row { background:rgba(201,168,76,0.09); border-left:2px solid var(--gold); }
+.w-day  { font-size:var(--f-xs); color:var(--text-lt); padding-top:0.05vw; }
+.w-info { display:flex; flex-direction:column; gap:0; }
+.w-name { font-size:var(--f-sm); color:var(--text-mid); line-height:1.25; }
+.w-name.featured { font-weight:600; color:var(--text-dk); }
+.w-detail { font-size:var(--f-xs); color:var(--text-lt); }
+
+/* Connect bar */
+.connect-bar { flex-shrink:0; margin-top:var(--sp-xs); padding-top:var(--sp-xs); border-top:1px solid rgba(201,168,76,0.12); display:flex; flex-direction:column; align-items:center; gap:0.3vw; }
+.connect-lbl { font-size:var(--f-xs); letter-spacing:.17em; text-transform:uppercase; color:var(--gold-dk); font-weight:600; }
+.social-row { display:flex; gap:0.2vw; flex-wrap:nowrap; justify-content:center; }
+.s-pill { display:flex; align-items:center; gap:0.15vw; padding:0.2vw 0.36vw; border-radius:1vw; border:1px solid rgba(201,168,76,0.18); font-size:var(--f-xs); color:var(--text-mid); text-decoration:none; background:rgba(255,252,247,0.6); transition:border-color .2s,background .2s; white-space:nowrap; }
+.s-pill:hover { border-color:rgba(201,168,76,0.4); background:rgba(255,252,247,0.9); }
+.s-pill svg { width:0.57vw; height:0.57vw; flex-shrink:0; }
+
+/* RIGHT PANEL */
+.right-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6vw; flex-shrink:0; }
+.right-title { font-family:'Playfair Display',serif; font-size:var(--f-2xl); font-weight:400; color:var(--text-dk); letter-spacing:-.02vw; }
+.right-title span { color:var(--gold-dk); }
+.right-meta-row { display:flex; align-items:center; gap:0.3vw; }
+.live-dot { width:0.36vw; height:0.36vw; border-radius:50%; background:var(--sage); animation:livePulse 2.5s ease-in-out infinite; }
+@keyframes livePulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(122,158,126,0.5)} 50%{opacity:.7;box-shadow:0 0 0 0.26vw rgba(122,158,126,0)} }
+.right-meta { font-size:var(--f-xs); color:var(--text-lt); }
+
+.ev-grid { flex:1; display:flex; gap:0.6vw; overflow:hidden; min-height:0; }
+.ev-col  { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; min-height:0; }
+.ev {
+  display:grid; grid-template-columns:2.3vw 1fr;
+  gap:0.4vw; align-items:center;
+  padding:0.45vw 0.6vw; border-radius:0.47vw; margin-bottom:0.26vw;
+  background:rgba(255,252,247,0.62);
+  border:1px solid rgba(201,168,76,0.09);
+  transition:background .15s,border-color .15s;
+  flex-shrink:0; min-width:0;
+}
+.ev:hover { background:rgba(255,252,247,0.92); border-color:rgba(201,168,76,0.2); }
+.ev.is-offsite { border-left:1px solid rgba(201,168,76,0.09); }
+
+.ev-date { display:flex; flex-direction:column; align-items:center; justify-content:center; width:2.08vw; height:2.08vw; flex-shrink:0; border-radius:0.42vw; background:rgba(237,232,220,0.55); border:1px solid rgba(201,168,76,0.09); }
+.ev-dn { font-family:'Playfair Display',serif; font-size:var(--f-lg); font-weight:500; color:var(--text-dk); line-height:1; }
+.ev-ds { font-size:var(--f-xs); font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-lt); margin-top:0.05vw; }
+
+.ev-info { min-width:0; }
+.ev-title { font-size:var(--f-base); font-weight:600; color:var(--text-dk); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:0.1vw; }
+.ev-meta-line { display:flex; align-items:center; gap:0.2vw; white-space:nowrap; overflow:hidden; font-size:var(--f-xs); color:var(--text-lt); }
+
+.state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:10vw; gap:0.5vw; text-align:center; grid-column:1/-1; }
+.spin   { width:1.5vw; height:1.5vw; border:2px solid rgba(201,168,76,.15); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.state-msg { font-size:var(--f-base); color:var(--text-mid); }
+.err-box { grid-column:1/-1; background:rgba(201,130,106,0.08); border:1px solid rgba(201,130,106,0.2); border-radius:0.5vw; padding:0.7vw 0.8vw; font-size:var(--f-sm); color:var(--rose); line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ══ LEFT ══ -->
+  <div class="panel panel-left">
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="https://static.squarespace.com/static/630b9f840a5f9519c23147f7/t/630ba88c40e6b6256d2c12cb/1661737100389/DFWYAS+Round+Logo.png" 
+             onerror="this.onerror=null;this.src='https://images.squarespace-cdn.com/content/v1/630b9f840a5f9519c23147f7/fdf228f4-79f3-4398-9dc6-a1355c89e1c4/DFWYAS+Round+Logo.png?format=300w'"
+             alt="DFWYAS">
+      </div>
+      <div>
+        <div class="brand-name">DFW Young &amp; Social Club</div>
+      </div>
+    </div>
+
+    <div class="clock-block">
+      <div class="clock-time" id="clkTime">12:00<span class="clock-ampm" id="clkAmpm">PM</span></div>
+      <div class="clock-date"  id="clkDate">Saturday, May 10</div>
+      <div class="clock-greet" id="clkGreet">Welcome in!</div>
+    </div>
+
+    <div class="sec-hdr" style="flex-shrink:0">
+      <div class="sec-lbl">Dance Classes</div>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="dance-scroll">
+      <div class="day-grp">
+        <div class="day-name">Monday</div>
+        <div class="cls-row"><span class="cls-time">6:00pm</span><span class="cls-name">Intermediate West Coast Swing</span></div>
+        <div class="cls-row"><span class="cls-time">7:00pm</span><span class="cls-name b">Beginner West Coast Swing</span></div>
+        <div class="cls-row"><span class="cls-time">8:00pm</span><span class="cls-name b">Beginner Line Dance</span></div>
+        <div class="cls-row"><span class="cls-time">8:45pm</span><span class="cls-name">Improver Line Dance</span></div>
+      </div>
+      <div class="day-grp">
+        <div class="day-name">Tuesday</div>
+        <div class="cls-row"><span class="cls-time">6:00pm</span><span class="cls-name">Advanced Salsa</span></div>
+        <div class="cls-row"><span class="cls-time">7:00pm</span><span class="cls-name">Intermediate Salsa</span></div>
+        <div class="cls-row"><span class="cls-time">8:00pm</span><span class="cls-name b">Beginner Salsa</span></div>
+      </div>
+      <div class="day-grp">
+        <div class="day-name">Thursday</div>
+        <div class="cls-row"><span class="cls-time">5:30pm</span><span class="cls-name">Advanced Rumba</span></div>
+        <div class="cls-row"><span class="cls-time">6:15pm</span><span class="cls-name">Advanced American Tango</span></div>
+        <div class="cls-row"><span class="cls-time">7:00pm</span><span class="cls-name b">Beginner Cha Cha</span></div>
+        <div class="cls-row"><span class="cls-time">7:45pm</span><span class="cls-name">Intermediate Nightclub Two-Step</span></div>
+        <div class="cls-row"><span class="cls-time">8:30pm</span><span class="cls-name">Intermediate Modern Pop Hustle</span></div>
+      </div>
+      <div class="day-grp">
+        <div class="day-name">Saturday</div>
+        <div class="cls-row"><span class="cls-time">3:00pm</span><span class="cls-name">Intermediate Bachata</span></div>
+        <div class="cls-row"><span class="cls-time">4:00pm</span><span class="cls-name b">Beginner Bachata</span></div>
+        <div class="cls-row"><span class="cls-time">5:00pm</span><span class="cls-name b">Beginner Salsa</span></div>
+        <div class="cls-row"><span class="cls-time">6:00pm</span><span class="cls-name">Intermediate Salsa</span></div>
+        <div class="cls-row"><span class="cls-time">7:00pm</span><span class="cls-name">Intermediate Waltz</span></div>
+      </div>
+    </div>
+
+    <div class="price-bar">
+      <div class="price-lbl" style="text-align:center;">Prices &amp; Dance Bundles</div>
+      <div class="price-grid">
+        <div class="price-cell"><div class="p-pack">Single</div><div class="p-amt">$15</div></div>
+        <div class="price-cell"><div class="p-pack">4 Pack</div><div class="p-amt">$52</div></div>
+        <div class="price-cell"><div class="p-pack">8 Pack</div><div class="p-amt">$88</div></div>
+        <div class="price-cell"><div class="p-pack">12 Pack</div><div class="p-amt">$108</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CENTER ══ -->
+  <div class="panel panel-mid">
+
+    <div class="today-card">
+      <div class="tc-bg"></div>
+      <div class="tc-deco" style="width:130px;height:130px;top:-45px;right:-25px;"></div>
+      <div class="tc-header">
+        <div class="tc-eyebrow">Today's Events</div>
+        <div class="tc-day-title" id="tcDayTitle">Saturday, May 9</div>
+        <div class="tc-count"    id="tcCount">Loading…</div>
+      </div>
+      <div class="tc-events" id="tcEvents">
+        <div class="tc-no-events">Loading calendar…</div>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="sc-lbl">Today</div><div class="sc-val" id="statToday">–</div><div class="sc-sub">events</div></div>
+      <div class="stat-cell"><div class="sc-lbl">This Week</div><div class="sc-val" id="statWeek">–</div><div class="sc-sub">events</div></div>
+      <div class="stat-cell"><div class="sc-lbl">This Month</div><div class="sc-val" id="statMonth">–</div><div class="sc-sub">events</div></div>
+    </div>
+
+    <div class="sec-hdr" style="flex-shrink:0; justify-content:center;">
+      <div class="sec-lbl">Free &amp; Recurring Events</div>
+    </div>
+
+    <div class="weekly-scroll">
+
+      <!-- SOCIAL & COMMUNITY -->
+      <div class="w-section">
+        <div class="w-sec-title">Social &amp; Community</div>
+        <div class="w-row" id="wrow-fri1">
+          <span class="w-day">1st Friday</span>
+          <div class="w-info">
+            <span class="w-name">Themed Social Mixer &amp; Dance Social</span>
+            <span class="w-detail">7:00pm · The Ballroom</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">2nd Friday</span>
+          <div class="w-info">
+            <span class="w-name">Trivia, Karaoke &amp; Potluck Social</span>
+            <span class="w-detail">7:30pm · DFWYAS Club Space</span>
+          </div>
+        </div>
+        <div class="w-row" id="wrow-fri3">
+          <span class="w-day">3rd Friday</span>
+          <div class="w-info">
+            <span class="w-name">Board Game Night</span>
+            <span class="w-detail">7:00pm · DFWYAS Club Space</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">Every Sat</span>
+          <div class="w-info">
+            <span class="w-name">Weekly Craft Social</span>
+            <span class="w-detail">2:00pm · The Nook</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">Biweekly Wed</span>
+          <div class="w-info">
+            <span class="w-name">DFWYAS Book Club</span>
+            <span class="w-detail">7:00pm · DFWYAS Club Space</span>
+          </div>
+        </div>
+        <div class="w-row" id="wrow-sun">
+          <span class="w-day">Every Sun</span>
+          <div class="w-info">
+            <span class="w-name">Coffee Hangout</span>
+            <span class="w-detail">10:00am · Location on Discord</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-section">
+        <div class="w-sec-title">Outdoors &amp; Nature</div>
+        <div class="w-row">
+          <span class="w-day">2nd Sunday</span>
+          <div class="w-info">
+            <span class="w-name">Arbor Hills Walk N Talk</span>
+            <span class="w-detail">9:00am · Arbor Hills Nature Preserve</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">3rd Sunday</span>
+          <div class="w-info">
+            <span class="w-name">Writing Group</span>
+            <span class="w-detail">Biweekly · Roving locations</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">3rd Saturday</span>
+          <div class="w-info">
+            <span class="w-name">Volunteer @ LLELA Nature Preserve</span>
+            <span class="w-detail">9:00am · LLELA, Lewisville</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">4th Sunday</span>
+          <div class="w-info">
+            <span class="w-name">DFW Area Nature Hike</span>
+            <span class="w-detail">9:00am · Various trails</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FITNESS & WELLNESS -->
+      <div class="w-section">
+        <div class="w-sec-title">Fitness &amp; Wellness</div>
+        <div class="w-row" id="wrow-wed">
+          <span class="w-day">Every Wed</span>
+          <div class="w-info">
+            <span class="w-name">Yoga</span>
+            <span class="w-detail">7:15pm · DFWYAS Club Space</span>
+          </div>
+        </div>
+        <div class="w-row">
+          <span class="w-day">Every Sat</span>
+          <div class="w-info">
+            <span class="w-name">Zumba Fitness</span>
+            <span class="w-detail">10:30am · DFWYAS Club Space</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Connect bar — centered -->
+    <div class="connect-bar">
+      <div class="connect-lbl">Connect With Us</div>
+      <div style="width:72px;height:72px;border-radius:10px;background:white;border:1px solid rgba(201,168,76,0.18);display:flex;align-items:center;justify-content:center;padding:3px;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=66x66&data=https://www.dfwyas.com/links" style="width:3.4vw;height:3.4vw;border-radius:0.3vw;display:block;" alt="QR Code">
+      </div>
+      <div class="social-row">
+        <a class="s-pill" href="https://www.instagram.com/dfwyoungsocial/" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          Instagram
+        </a>
+        <a class="s-pill" href="https://www.facebook.com/dfwyoungsocial/" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          Facebook
+        </a>
+        <a class="s-pill" href="https://www.meetup.com/dfwyoungsocial/" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="6"/><path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
+          Meetup
+        </a>
+        <a class="s-pill" href="https://discord.gg/7Egum6UvMe" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0zm4 0a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/><path d="M20.317 4.37A19.8 19.8 0 0 0 16 3l-.18.3A13.7 13.7 0 0 0 12 3c-1.32 0-2.64.18-3.82.3L8 3A19.8 19.8 0 0 0 3.683 4.37 20 20 0 0 0 1 16.8c2.195 1.61 4.31 2.59 6.397 3.23a15 15 0 0 0 1.283-2.1 13 13 0 0 1-2.017-.961c.17-.124.335-.254.495-.386 3.9 1.81 8.12 1.81 11.97 0 .163.132.328.262.496.386-.644.378-1.317.7-2.02.963a15 15 0 0 0 1.283 2.098c2.09-.64 4.206-1.62 6.402-3.23A20.1 20.1 0 0 0 20.317 4.37z"/></svg>
+          Discord
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="panel panel-right">
+    <div class="right-hdr">
+      <div class="right-title">Upcoming <span>Events, Classes &amp; Workshops</span></div>
+      <div class="right-meta-row">
+        <div class="live-dot"></div>
+        <div class="right-meta" id="updatedAt">Connecting…</div>
+      </div>
+    </div>
+
+    <div class="ev-grid" id="evGrid">
+      <div class="ev-col"><div class="state"><div class="spin"></div><div class="state-msg">Loading…</div></div></div>
+      <div class="ev-col"></div>
+    </div>
+
+    <div style="flex-shrink:0;margin-top:8px;padding:7px 14px;border-radius:8px;background:rgba(28,26,20,0.85);text-align:center;font-size:13px;font-weight:500;color:rgba(232,213,163,0.9);letter-spacing:0.03em;">
+      All transactions incur a 9% fee that covers processing costs, community growth, and assistance programs.
+    </div>
+  </div>
+
+</div>
+<script>
+const CAL_ID  = 'c_8e0b0a83b5f36d5ce7468cd48de53438c041a82de189e0b6f8fdbc40c6c47f16@group.calendar.google.com';
+const API_KEY = 'AIzaSyBnH033adrS-rP0VDXoWCqkzEs-X0XviV0';
+
+const ONSITE_KEYWORDS = ['ballroom','nook','tavern','creative studio','common area','dfwyas','dfw young','springlake','suite 600','farmers branch'];
+const PRIVATE_KEYWORDS = ['private dance lesson','private lesson'];
+
+// Events to exclude from the right feed — dance classes already shown in left panel
+const EXCLUDE_KEYWORDS = [
+  'salsa','bachata','waltz','tango','swing class','cha cha','rumba','foxtrot','hustle','samba','lindy','line dance','west coast','nightclub two','pop hustle','zumba','yoga','wind-down flow'
+];
+
+function isExcluded(title) {
+  const t = (title||'').toLowerCase();
+  return EXCLUDE_KEYWORDS.some(k => t.includes(k));
+}
+
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Rotating greetings by time of day
+const GREETINGS = {
+  morning: [
+    "Rise and shine — great things are happening today! ☀️",
+    "Good morning! Coffee's better with good company.",
+    "Morning! The best day starts with great people.",
+    "Early bird energy! Welcome in! 🐦",
+    "Good morning — today's going to be a great one!",
+  ],
+  afternoon: [
+    "Afternoon! You made it to the best part of the day. 🎉",
+    "Good afternoon — something fun is always happening here!",
+    "Hey there! Perfect time to try something new today.",
+    "Afternoon vibes only. Welcome in! ✨",
+    "Good afternoon — glad you're here!",
+  ],
+  evening: [
+    "Good evening — the night is just getting started! 🌙",
+    "Evening! Best decision you made today: showing up.",
+    "The night's yours. Make it memorable! 🌟",
+    "Good evening — ready for a great time?",
+    "Evening! Come on in, the fun's already started. 🎊",
+  ]
+};
+
+let greetingIdx = { morning:0, afternoon:0, evening:0 };
+let lastGreetHour = -1;
+
+let allEvents = [];
+
+// ── CLOCK ─────────────────────────────────────────────
+function tick() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  document.getElementById('clkTime').firstChild.textContent = `${h}:${String(m).padStart(2,'0')}`;
+  document.getElementById('clkAmpm').textContent = ap;
+  const n = new Date();
+  document.getElementById('clkDate').textContent = `${DAYS[n.getDay()]}, ${MONTHS[n.getMonth()]} ${n.getDate()}`;
+
+  // Rotate greeting every hour
+  const hr = n.getHours();
+  if (hr !== lastGreetHour) {
+    lastGreetHour = hr;
+    const period = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
+    const list = GREETINGS[period];
+    document.getElementById('clkGreet').textContent = list[greetingIdx[period] % list.length];
+    greetingIdx[period]++;
+  }
+
+  highlightDay();
+}
+setInterval(tick, 1000); tick();
+
+function highlightDay() {
+  const d = new Date().getDay();
+  const map = {5:'wrow-fri1',6:'wrow-sat',0:'wrow-sun'};
+  document.querySelectorAll('.w-row').forEach(r => r.classList.remove('today-row'));
+  if (map[d]) { const el = document.getElementById(map[d]); if(el) el.classList.add('today-row'); }
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function evStart(e) {
+  if (e.start.dateTime) return new Date(e.start.dateTime);
+  const [y,m,d] = e.start.date.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+function isAllDay(e) { return !!e.start.date && !e.start.dateTime; }
+function isToday(dt) {
+  const n = new Date();
+  return dt.getDate()===n.getDate() && dt.getMonth()===n.getMonth() && dt.getFullYear()===n.getFullYear();
+}
+function fmtTime(e) {
+  if (isAllDay(e)) return 'All Day';
+  return new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+function isOffsite(loc) {
+  if (!loc) return false;
+  const l = loc.toLowerCase();
+  return !ONSITE_KEYWORDS.some(v => l.includes(v));
+}
+function isPrivate(e) {
+  const t = (e.summary||'').toLowerCase();
+  return PRIVATE_KEYWORDS.some(k => t.includes(k));
+}
+function guessCategory(s='',d='') {
+  const t = (s+' '+d).toLowerCase();
+  if (/dance|salsa|bachata|waltz|tango|swing|cha cha|rumba|foxtrot|hustle|samba|lindy|line danc/.test(t)) return {l:'Dance',c:'cat-dance'};
+  if (/yoga|zumba|fitness|workout|hike|walk n talk|nature|run/.test(t)) return {l:'Fitness',c:'cat-fitness'};
+  if (/board game|d&d|dungeon|mahjong|ttrpg|trivia|rpg/.test(t)) return {l:'Games',c:'cat-games'};
+  if (/paint|craft|art|crochet|clay|origami|sew|flower|decoupage|knit/.test(t)) return {l:'Arts',c:'cat-arts'};
+  if (/social|mixer|potluck|book club|writing|karaoke|improv|meet|chat|coffee/.test(t)) return {l:'Social',c:'cat-social'};
+  return {l:'Event',c:'cat-other'};
+}
+function guessPrice(e) {
+  const desc  = (e.description||'').toLowerCase();
+  const title = (e.summary||'').toLowerCase();
+  const full  = desc + ' ' + title;
+  const dollarMatch = (e.description||'').match(/\$\s*(\d+)/);
+  if (dollarMatch) return { label:`$${dollarMatch[1]}`, cls:'' };
+  if (/free/.test(full))              return { label:'Free', cls:'free' };
+  if (/donation|donate/.test(full))   return { label:'Donation', cls:'donation' };
+  return { label:'', cls:'' };
+}
+
+// ── FETCH ─────────────────────────────────────────────
+async function fetchEvents() {
+  const now = new Date();
+  const sod = new Date(now); sod.setHours(0,0,0,0);
+  const som = new Date(now.getFullYear(), now.getMonth(), 1); // start of month for stats
+  const end = new Date(now); end.setDate(end.getDate()+30);
+  const params = new URLSearchParams({
+    key: API_KEY, timeMin: som.toISOString(), timeMax: end.toISOString(),
+    singleEvents: true, orderBy: 'startTime', maxResults: 500
+  });
+  try {
+    const res  = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CAL_ID)}/events?${params}`);
+    const data = await res.json();
+    if (data.error) { showError(data.error.message, data.error.code); return; }
+    // Filter out cancelled AND private events
+    allEvents = (data.items||[]).filter(e => e.status !== 'cancelled' && !isPrivate(e));
+    const now = new Date();
+    // Feed only shows future events; stats and today card use full day's events
+    const futureEvents = allEvents.filter(e => evStart(e) >= now);
+    const feedEvents = futureEvents.filter(e => !isExcluded(e.summary));
+    renderTodayCard(allEvents);
+    renderFeed(feedEvents);
+    updateStats(allEvents);
+    const ts = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    document.getElementById('updatedAt').textContent = `Updated ${ts}`;
+  } catch(err) {
+    showError('Network error', 0);
+  }
+}
+
+// ── TODAY CARD ────────────────────────────────────────
+function renderTodayCard(evs) {
+  const now = new Date();
+  const todayEvs = evs.filter(e => isToday(evStart(e)));
+  const n = new Date();
+  document.getElementById('tcDayTitle').textContent = `${DAYS[n.getDay()]}, ${MONTHS[n.getMonth()]} ${n.getDate()}`;
+  document.getElementById('tcCount').textContent = todayEvs.length
+    ? `${todayEvs.length} event${todayEvs.length!==1?'s':''} today`
+    : 'No events scheduled today';
+
+  if (!todayEvs.length) {
+    document.getElementById('tcEvents').innerHTML = '<div class="tc-no-events">Nothing on the calendar today — check Discord for pop-ups!</div>';
+    return;
+  }
+
+  const rowsHTML = todayEvs.map(e => {
+    const s = evStart(e);
+    const happening = !isAllDay(e) && s <= now;
+    const loc = e.location || '';
+    const shortLoc = loc.split(',')[0];
+    const price = guessPrice(e);
+    return `<div class="tc-ev${happening?' tc-happening':''}">
+      <div class="tc-ev-time">${fmtTime(e)}</div>
+      <div class="tc-ev-info">
+        <div class="tc-ev-title">${e.summary||'Event'}</div>
+        ${shortLoc ? `<div class="tc-ev-loc">📍 ${shortLoc}</div>` : ''}
+      </div>
+      ${price.label ? `<div class="tc-ev-price">${price.label}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Only scroll if more than 3 events — duplicate content for seamless loop
+  const needsScroll = todayEvs.length > 3;
+  const duration = todayEvs.length * 5; // ~5s per event, slower
+  const divider = `<div style="height:1px;background:rgba(201,168,76,0.25);margin:6px 0 10px;"></div>`;
+  const inner = needsScroll
+    ? `<div class="tc-events-inner" style="animation-duration:${duration}s">${rowsHTML}${divider}${rowsHTML}${divider}</div>`
+    : rowsHTML;
+
+  document.getElementById('tcEvents').innerHTML = inner;
+}
+
+// ── FEED (two-column) ─────────────────────────────────
+function renderFeed(evs) {
+  const grid = document.getElementById('evGrid');
+  if (!evs.length) {
+    grid.innerHTML = '<div class="state"><div style="font-size:22px">🎉</div><div class="state-msg">No upcoming events</div></div>';
+    return;
+  }
+
+  // Build flat ordered list of items
+  const groups = {};
+  evs.forEach(e => {
+    const s = evStart(e);
+    const k = `${s.getFullYear()}-${String(s.getMonth()).padStart(2,'0')}`;
+    if (!groups[k]) groups[k] = {label:MONTHS[s.getMonth()], evs:[]};
+    groups[k].evs.push(e);
+  });
+
+  // Flatten to HTML snippets — no month headers, no highlights
+  const items = [];
+  Object.values(groups).forEach(g => {
+    g.evs.forEach(e => {
+      const s        = evStart(e);
+      const loc      = e.location || '';
+      const shortLoc = loc.split(',')[0];
+      const offsite  = isOffsite(loc);
+      const price    = guessPrice(e);
+      const metaParts = [fmtTime(e)];
+      if (shortLoc) metaParts.push(shortLoc);
+      if (price.label) metaParts.push(price.label);
+      const metaLine = metaParts.join(' · ');
+      items.push(`<div class="ev${offsite?' is-offsite':''}">
+        <div class="ev-date">
+          <div class="ev-dn">${s.getDate()}</div>
+          <div class="ev-ds">${DAYS[s.getDay()]}</div>
+        </div>
+        <div class="ev-info">
+          <div class="ev-title">${e.summary||'Event'}</div>
+          <div class="ev-meta-line">${metaLine}</div>
+        </div>
+      </div>`);
+    });
+  });
+
+  // Render all in col 1 first, then move overflow to col 2
+  grid.innerHTML = `
+    <div class="ev-col" id="evCol1">${items.join('')}</div>
+    <div class="ev-col" id="evCol2"></div>
+  `;
+
+  // Wait for full paint then balance columns
+  setTimeout(() => {
+    const col1 = document.getElementById('evCol1');
+    const col2 = document.getElementById('evCol2');
+    if (!col1 || !col2) return;
+    const maxH = grid.clientHeight;
+
+    // Move overflowing items from col1 to col2
+    while (col1.scrollHeight > maxH && col1.children.length > 1) {
+      col2.appendChild(col1.lastElementChild);
+    }
+    // Re-order col2 chronologically
+    const col2Items = Array.from(col2.children);
+    col2Items.reverse().forEach(el => col2.appendChild(el));
+
+    // Second pass — trim any col2 overflow too
+    while (col2.scrollHeight > maxH && col2.children.length > 0) {
+      col2.removeChild(col2.lastElementChild);
+    }
+  }, 200);
+}
+
+// ── STATS ─────────────────────────────────────────────
+function updateStats(evs) {
+  const now = new Date();
+  const sod = new Date(now); sod.setHours(0,0,0,0);
+  const eod = new Date(now); eod.setHours(23,59,59,999);
+  const eow = new Date(now); eow.setDate(now.getDate()+7);
+  const eom = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
+  const som = new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0); // start of month
+  document.getElementById('statToday').textContent = evs.filter(e=>{const s=evStart(e);return s>=sod&&s<=eod;}).length;
+  document.getElementById('statWeek').textContent  = evs.filter(e=>{const s=evStart(e);return s>=sod&&s<=eow;}).length;
+  document.getElementById('statMonth').textContent = evs.filter(e=>{const s=evStart(e);return s>=som&&s<=eom;}).length;
+}
+
+// ── TICKER ────────────────────────────────────────────
+function buildTicker(evs) {
+  if (!evs.length) return;
+  document.getElementById('ticker').style.display = 'flex';
+  const items = evs.slice(0,18).map(e => `${e.summary} · ${MONTHS[evStart(e).getMonth()]} ${evStart(e).getDate()}`);
+  const doubled = [...items,...items];
+  document.getElementById('tickerIn').innerHTML = doubled.map(t=>`<span class="tick-item">${t}</span>`).join('');
+}
+
+// ── ERROR ─────────────────────────────────────────────
+function showError(msg, code) {
+  document.getElementById('updatedAt').textContent = '⚠ Error';
+  let hint = '';
+  if (code===403) hint = 'Share the calendar with your service account and grant "See all event details".';
+  else if (code===404) hint = 'Calendar ID not found.';
+  document.getElementById('evGrid').innerHTML = `<div class="ev-col"><div class="err-box"><strong>Calendar error</strong>${msg}${hint?'<br><br>'+hint:''}</div></div><div class="ev-col"></div>`;
+  document.getElementById('tcEvents').innerHTML = `<div class="tc-no-events">Calendar unavailable</div>`;
+}
+
+// ── INIT ──────────────────────────────────────────────
+fetchEvents();
+setInterval(fetchEvents, 5 * 60 * 1000);
+</script>
+</body>
+</html>
