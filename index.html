@@ -720,32 +720,41 @@ function renderFeed(evs) {
     });
   });
 
-  // Render all in col 1 first, then move overflow to col 2
-  grid.innerHTML = `
-    <div class="ev-col" id="evCol1">${items.join('')}</div>
-    <div class="ev-col" id="evCol2"></div>
-  `;
+  // Render one item at a time into col1 until it fills, then col2
+  const col1 = document.createElement('div');
+  const col2 = document.createElement('div');
+  col1.className = 'ev-col';
+  col2.className = 'ev-col';
+  col1.id = 'evCol1';
+  col2.id = 'evCol2';
+  grid.innerHTML = '';
+  grid.appendChild(col1);
+  grid.appendChild(col2);
 
-  // Wait for full paint then balance columns
-  setTimeout(() => {
-    const col1 = document.getElementById('evCol1');
-    const col2 = document.getElementById('evCol2');
-    if (!col1 || !col2) return;
+  // Give grid a moment to get its height, then fill
+  requestAnimationFrame(() => {
     const maxH = grid.clientHeight;
+    let col1Full = false;
 
-    // Move overflowing items from col1 to col2
-    while (col1.scrollHeight > maxH && col1.children.length > 1) {
-      col2.appendChild(col1.lastElementChild);
-    }
-    // Re-order col2 chronologically
-    const col2Items = Array.from(col2.children);
-    col2Items.reverse().forEach(el => col2.appendChild(el));
+    items.forEach(html => {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      const el = tmp.firstElementChild;
 
-    // Second pass — trim any col2 overflow too
-    while (col2.scrollHeight > maxH && col2.children.length > 0) {
-      col2.removeChild(col2.lastElementChild);
-    }
-  }, 200);
+      if (!col1Full) {
+        col1.appendChild(el);
+        if (col1.scrollHeight > maxH) {
+          col1.removeChild(el);
+          col1Full = true;
+          col2.appendChild(el);
+        }
+      } else {
+        if (col2.scrollHeight + el.offsetHeight <= maxH) {
+          col2.appendChild(el);
+        }
+      }
+    });
+  });
 }
 
 // ── STATS ─────────────────────────────────────────────
